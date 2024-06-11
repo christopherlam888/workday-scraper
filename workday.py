@@ -6,9 +6,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import time
-import uuid
 import argparse
 import sys
+
+company_urls = {
+    "Nvidia": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite?workerSubType=0c40f6bd1d8f10adf6dae42e46d44a17&workerSubType=ab40a98049581037a3ada55b087049b7&locationHierarchy1=2fcb99c455831013ea52fb338f2932d8",
+    "Intel": "https://intel.wd1.myworkdayjobs.com/en-US/External?timeType=dc193d6170de10860883d9bf7c0e01a9&jobFamilyGroup=dc8bf79476611087d67b36517cf17036&locations=1e4a4eb3adf10174f0548376bf811bcf&locations=1e4a4eb3adf1016541777876bf8111cf&locations=1e4a4eb3adf1011246675c76bf81f8ce&locations=1e4a4eb3adf10146fd5c5276bf81eece&locations=1e4a4eb3adf101d4e5a61779bf8159d1&locations=1e4a4eb3adf10118b1dfe877bf8162d0&locations=1e4a4eb3adf10129d05fe377bf815dd0&locations=1e4a4eb3adf1013ddb7bd877bf8153d0&locations=1e4a4eb3adf1018c4bf78f77bf8112d0&locations=1e4a4eb3adf101b8aec18a77bf810dd0&locations=1e4a4eb3adf101630310dd75bf81a9ce&locations=1e4a4eb3adf1019f4237e975bf81b3ce&workerSubType=dc8bf79476611087dfde99931439ae75",
+}  # Add company URLs here
 
 
 def parse_args():
@@ -27,6 +31,41 @@ def parse_args():
     return args
 
 
+def get_driver():
+    options = Options()
+    options.add_argument("--headless")
+    driver = webdriver.Chrome(options=options)
+    return driver
+
+
+def generate_rss(jobs):
+    rss = """\
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+<title>Workday Scraper - RSS Feed</title>
+<link>https://github.com/christopherlam888/workday-scraper</link>
+<description>An RSS feed for new Workday postings.</description>
+"""
+
+    for job_info in jobs:
+        rss += """\
+<item>
+    <title><![CDATA[{}]]></title>
+    <link><![CDATA[{}]]></link>
+    <description><![CDATA[{}]]></description>
+</item>
+""".format(
+            f"{job_info['company']}: {job_info['job_title']}",
+            f"{job_info['job_href']}",
+            f"{job_info['job_posting_text']}",
+        )
+
+    rss += "\n</channel>\n</rss>"
+    return rss
+
+
 args = parse_args()
 perpetual = args["perpetual"]
 period = args["time-period"]
@@ -39,20 +78,13 @@ try:
 except FileNotFoundError:
     job_ids_dict = {}
 
-options = Options()
-options.add_argument("--headless")
-driver = webdriver.Chrome(options=options)
-
-wait = WebDriverWait(driver, 10)
-
-company_urls = {
-    "Nvidia": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite?workerSubType=0c40f6bd1d8f10adf6dae42e46d44a17&workerSubType=ab40a98049581037a3ada55b087049b7&locationHierarchy1=2fcb99c455831013ea52fb338f2932d8",
-    "Intel": "https://intel.wd1.myworkdayjobs.com/en-US/External?timeType=dc193d6170de10860883d9bf7c0e01a9&jobFamilyGroup=dc8bf79476611087d67b36517cf17036&locations=1e4a4eb3adf10174f0548376bf811bcf&locations=1e4a4eb3adf1016541777876bf8111cf&locations=1e4a4eb3adf1011246675c76bf81f8ce&locations=1e4a4eb3adf10146fd5c5276bf81eece&locations=1e4a4eb3adf101d4e5a61779bf8159d1&locations=1e4a4eb3adf10118b1dfe877bf8162d0&locations=1e4a4eb3adf10129d05fe377bf815dd0&locations=1e4a4eb3adf1013ddb7bd877bf8153d0&locations=1e4a4eb3adf1018c4bf78f77bf8112d0&locations=1e4a4eb3adf101b8aec18a77bf810dd0&locations=1e4a4eb3adf101630310dd75bf81a9ce&locations=1e4a4eb3adf1019f4237e975bf81b3ce&workerSubType=dc8bf79476611087dfde99931439ae75",
-}  # Add company URLs here
-
 for company in company_urls:
     if company_urls[company] not in job_ids_dict:
         job_ids_dict[company_urls[company]] = []
+
+driver = get_driver()
+
+wait = WebDriverWait(driver, 10)
 
 while True:
     jobs = []
@@ -113,7 +145,9 @@ while True:
 
         print(len(jobstosend))
 
-        for job_title, job_href in jobstosend:
+        for jobtosend in jobstosend:
+            job_title = jobtosend[0]
+            job_href = jobtosend[1]
             driver.get(job_href)
             time.sleep(1)
             job_posting_element = wait.until(
@@ -122,8 +156,8 @@ while True:
                 )
             )
             job_posting_text = job_posting_element.text
-            redis_id = str(uuid.uuid4())
             job_info = {
+                "company": company,
                 "company_url": seturl,
                 "job_title": job_title,
                 "job_href": job_href,
@@ -137,6 +171,10 @@ while True:
     jsondata = json.dumps(jobs, indent=4)
     with open("job_postings.json", "w") as jsonfile:
         jsonfile.write(jsondata)
+
+    # Write job postings to an RSS file
+    with open("rss.xml", "w") as rssfile:
+        rssfile.write(generate_rss(jobs))
 
     # Save job_ids_dict to file
     with open("job_ids_dict.pkl", "wb") as f:
