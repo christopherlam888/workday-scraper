@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  CHANGES: False
+  CHANGES: True
 
 jobs:
   run:
@@ -32,11 +32,13 @@ jobs:
       run: mv rss.xml rss-chris.xml
     - name: Stash changes
       run: |
-        git stash || echo "No changes!" && echo "CHANGES=True" >> $GITHUB_ENV
+        git stash || echo "No changes!" && echo "CHANGES=False" >> $GITHUB_ENV
     - uses: actions/checkout@v4
+      if: env.CHANGES
       with:
         ref: rss
     - name: Push to rss
+      if: env.CHANGES
       run: |
         git stash apply
         git config --global user.name "${GITHUB_ACTOR}"
