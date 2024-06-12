@@ -59,7 +59,7 @@ def generate_rss(jobs):
 """.format(
             f"{job_info['company']}: {job_info['job_title']}",
             f"{job_info['job_href']}",
-            f"{job_info['job_posting_text']}",
+            f"{job_info['job_posting_text'].replace('\n', '<br>')}",
         )
 
     rss += "\n</channel>\n</rss>"
