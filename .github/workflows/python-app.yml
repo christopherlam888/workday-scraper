@@ -33,6 +33,6 @@ jobs:
         git checkout rss
         git config --global user.name "${GITHUB_ACTOR}"
         git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-        git add .
+        git add *.xml
         git commit -m "Run Workday Scraper"
         git push
