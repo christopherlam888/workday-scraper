@@ -24,7 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run
-      run: python workday.py
+      run: python workday.py -f chris.txt
     - name: Rename
       run: mv rss.xml rss-chris.xml
     - uses: actions/upload-artifact@v4
