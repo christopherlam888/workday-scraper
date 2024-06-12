@@ -33,13 +33,13 @@ jobs:
     - name: Stash changes
       run: |
         git stash || echo "No changes!" && echo "CHANGES=False" >> $GITHUB_ENV
-    - uses: actions/checkout@v4
-      if: env.CHANGES
-      with:
-        ref: rss
     - name: Push to rss
       if: env.CHANGES
       run: |
+        git branch
+        git pull
+        git branch
+        git checkout rss
         git stash apply
         git config --global user.name "${GITHUB_ACTOR}"
         git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
