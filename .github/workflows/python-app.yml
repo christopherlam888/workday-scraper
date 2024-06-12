@@ -27,14 +27,14 @@ jobs:
       run: python workday.py
     - name: Rename
       run: mv rss.xml rss-chris.xml
-    - uses: action/upload-artifact@v4
+    - uses: actions/upload-artifact@v4
       with:
         path: rss-chris.xml
     - name: RSS branch
       run: |
         git checkout --orphan rss
         git rm -rf .
-    - uses: action/download-artifact@v4
+    - uses: actions/download-artifact@v4
     - name: Push to rss
       run: |
         git config --global user.name "${GITHUB_ACTOR}"
