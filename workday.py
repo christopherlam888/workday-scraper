@@ -50,6 +50,7 @@ def generate_rss(jobs):
 """
 
     for job_info in jobs:
+        job_posting_text = job_info["job_posting_text"].replace("\n", "<br>")
         rss += """\
 <item>
     <title><![CDATA[{}]]></title>
@@ -59,7 +60,7 @@ def generate_rss(jobs):
 """.format(
             f"{job_info['company']}: {job_info['job_title']}",
             f"{job_info['job_href']}",
-            f"{job_info['job_posting_text'].replace('\n', '<br>')}",
+            f"{job_posting_text}",
         )
 
     rss += "\n</channel>\n</rss>"
