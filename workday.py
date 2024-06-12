@@ -12,7 +12,7 @@ import sys
 
 def read_file(file):
     company_urls = {}
-    with open(file, "r") as inputfile:
+    with open(f"configs/{file}", "r") as inputfile:
         for line in inputfile:
             name, url = line.strip().split(",")
             company_urls[name] = url
