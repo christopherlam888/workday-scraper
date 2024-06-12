@@ -8,6 +8,8 @@ from selenium.webdriver.chrome.options import Options
 import time
 import argparse
 import sys
+import smtplib
+from email.mime.text import MIMEText
 
 
 def read_file(file):
@@ -22,6 +24,27 @@ def read_file(file):
 def parse_args():
     parser = argparse.ArgumentParser(description="Available Options")
     parser.add_argument("-f", "--file", dest="file", type=str, required=True)
+    parser.add_argument(
+        "-e",
+        "--email",
+        dest="email",
+        type=str,
+        required="--recipients" in sys.argv and "--password" in sys.argv,
+    )
+    parser.add_argument(
+        "-pw",
+        "--password",
+        dest="password",
+        type=str,
+        required="--email" in sys.argv and "--recipients" in sys.argv,
+    )
+    parser.add_argument(
+        "-r",
+        "--recipients",
+        dest="recipients",
+        type=str,
+        required="--email" in sys.argv and "--password" in sys.argv,
+    )
     parser.add_argument("-p", "--perpetual", dest="perpetual", action="store_true")
     parser.add_argument(
         "-t",
@@ -70,6 +93,26 @@ def generate_rss(jobs):
 
     rss += "\n</channel>\n</rss>"
     return rss
+
+
+def send_email(subject, body, sender, recipients, password):
+    # Create a MIMEText object with the body of the email.
+    msg = MIMEText(body, "html")
+    # Set the subject of the email.
+    msg["Subject"] = subject
+    # Set the sender's email.
+    msg["From"] = sender
+    # Join the list of recipients into a single string separated by commas.
+    msg["To"] = ", ".join(recipients)
+
+    # Connect to Gmail's SMTP server using SSL.
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp_server:
+        # Login to the SMTP server using the sender's credentials.
+        smtp_server.login(sender, password)
+        # Send the email. The sendmail function requires the sender's email, the list of recipients, and the email message as a string.
+        smtp_server.sendmail(sender, recipients, msg.as_string())
+    # Print a message to console after successfully sending the email.
+    print("Message sent!")
 
 
 args = parse_args()
@@ -190,6 +233,30 @@ while True:
         pickle.dump(job_ids_dict, f)
 
     print("Files written.")
+
+    # Define the subject and body of the email.
+    subject = "Workday Scraper: Today's Jobs"
+    body = """
+    <html>
+      <body>
+    """
+    for job_info in jobs:
+        body += f"""
+        <p><a href="{job_info['job_href']}">{job_info['company']}: {job_info['job_title']}</a></p>
+        """
+    body += """
+      </body>
+    </html>
+    """
+    # Define the sender's email address.
+    sender = args["email"]
+    # List of recipients to whom the email will be sent.
+    recipients = args["recipients"].split(",")
+    # Password for the sender's email account.
+    password = args["password"]
+    if sender:
+        send_email(subject, body, sender, recipients, password)
+        print("Email sent.")
 
     if not perpetual:
         break
