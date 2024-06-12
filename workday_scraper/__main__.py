@@ -7,8 +7,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import time
 
-# import multiprocessing as multiprocessing
-# import tqdm
+import multiprocessing.dummy as multiprocessing
+import tqdm
 
 from .parse_args import parse_args
 from .rss_funcs import generate_rss
@@ -32,27 +32,31 @@ def get_driver():
 
 
 def scrape_job_posting(jobtosend, company, seturl):
-    driver = get_driver()
-    wait = WebDriverWait(driver, 10)
-    job_title = jobtosend[0]
-    job_href = jobtosend[1]
-    driver.get(job_href)
-    time.sleep(1)
-    job_posting_element = wait.until(
-        EC.presence_of_element_located(
-            (By.XPATH, '//div[@data-automation-id="job-posting-details"]')
+    try:
+        driver = get_driver()
+        wait = WebDriverWait(driver, 10)
+        job_title = jobtosend[0]
+        job_href = jobtosend[1]
+        driver.get(job_href)
+        time.sleep(1)
+        job_posting_element = wait.until(
+            EC.presence_of_element_located(
+                (By.XPATH, '//div[@data-automation-id="job-posting-details"]')
+            )
         )
-    )
-    job_posting_text = job_posting_element.text
-    driver.close()
-    job_info = {
-        "company": company,
-        "company_url": seturl,
-        "job_title": job_title,
-        "job_href": job_href,
-        "job_posting_text": job_posting_text,
-    }
-    return job_info
+        job_posting_text = job_posting_element.text
+        driver.close()
+        job_info = {
+            "company": company,
+            "company_url": seturl,
+            "job_title": job_title,
+            "job_href": job_href,
+            "job_posting_text": job_posting_text,
+        }
+        return job_info
+    except:
+        print("Failed! Retrying...")
+        return scrape_job_posting(jobtosend, company, seturl)
 
 
 def main():
@@ -139,17 +143,17 @@ def main():
 
             print(f"Found {len(jobstosend)} jobs for {company}.")
 
-            for job_info in jobstosend:
-                job_info = scrape_job_posting(job_info, company, seturl)
-                jobs.append(job_info)
+            # for job_info in jobstosend:
+            #     job_info = scrape_job_posting(job_info, company, seturl)
+            #     jobs.append(job_info)
 
-            # with multiprocessing.Pool() as pool, tqdm.tqdm(
-            #     total=len(jobstosend)
-            # ) as pbar:
-            #     params = [(jobtosend, company, seturl) for jobtosend in jobstosend]
-            #     for job_info in pool.starmap(scrape_job_posting, params):
-            #         jobs.append(job_info)
-            #         pbar.update()
+            with multiprocessing.Pool() as pool, tqdm.tqdm(
+                total=len(jobstosend)
+            ) as pbar:
+                params = [(jobtosend, company, seturl) for jobtosend in jobstosend]
+                for job_info in pool.starmap(scrape_job_posting, params):
+                    jobs.append(job_info)
+                    pbar.update()
 
         print("Done scraping.")
 
