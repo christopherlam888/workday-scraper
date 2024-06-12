@@ -29,30 +29,44 @@ def parse_args():
         "--email",
         dest="email",
         type=str,
-        required="--recipients" in sys.argv and "--password" in sys.argv,
+        required="-r" in sys.argv
+        or "--recipients" in sys.argv
+        or "-pw" in sys.argv
+        or "--password" in sys.argv,
     )
     parser.add_argument(
         "-pw",
         "--password",
         dest="password",
         type=str,
-        required="--email" in sys.argv and "--recipients" in sys.argv,
+        required="-e" in sys.argv
+        or "--email" in sys.argv
+        or "-r" in sys.argv
+        or "--recipients" in sys.argv,
     )
     parser.add_argument(
         "-r",
         "--recipients",
         dest="recipients",
         type=str,
-        required="--email" in sys.argv and "--password" in sys.argv,
+        required="-e" in sys.argv
+        or "--email" in sys.argv
+        or "-pw" in sys.argv
+        or "--password" in sys.argv,
     )
-    parser.add_argument("-p", "--perpetual", dest="perpetual", action="store_true")
+    parser.add_argument(
+        "-p",
+        "--perpetual",
+        dest="perpetual",
+        action="store_true",
+        required="-t" in sys.argv or "--time-period" in sys.argv,
+    )
     parser.add_argument(
         "-t",
         "--time-period",
         dest="time-period",
         type=int,
         default=1,
-        required="--perpetual" in sys.argv,
     )
     parser.add_argument("-i", "--initial", dest="initial", action="store_true")
     args = vars(parser.parse_args())
@@ -254,7 +268,7 @@ while True:
     recipients = args["recipients"].split(",")
     # Password for the sender's email account.
     password = args["password"]
-    if sender:
+    if sender and len(jobs) > 0:
         send_email(subject, body, sender, recipients, password)
         print("Email sent.")
 
