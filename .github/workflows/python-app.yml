@@ -24,7 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run
-      run: python workday.py -f chris.txt
+      run: python workday.py -f chris.txt -e ${{ secrets.EMAIL_SENDER }} -pw ${{ secrets.EMAIL_PASSWORD }} -r ${{ secrets.EMAIL_TEST_RECIPIENT }}
     - name: Rename
       run: mv rss.xml rss-chris.xml
     - uses: actions/upload-artifact@v4
