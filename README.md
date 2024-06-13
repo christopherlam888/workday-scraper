@@ -1,4 +1,4 @@
-# Chrono Crawler
+# Workday Scraper
 
 <p align="left">
 <img src="https://img.shields.io/github/languages/top/christopherlam888/workday-scraper.svg" >
