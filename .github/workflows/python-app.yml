@@ -35,18 +35,13 @@ jobs:
       run: |
         mkdir rss
         mv rss-* rss
-    - uses: actions/upload-artifact@v4
-      with:
-        path: rss
     - name: RSS branch
       run: |
         git checkout --orphan rss
-        git rm -rf .
-    - uses: actions/download-artifact@v4
     - name: Push to rss
       run: |
         git config --global user.name "${GITHUB_ACTOR}"
         git config --global user.email ${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com
-        git add rss/*
+        git add rss
         git commit -m "Run Workday Scraper"
         git push --set-upstream origin rss --force
