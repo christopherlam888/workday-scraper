@@ -27,9 +27,17 @@ jobs:
       run: python -m workday_scraper -f chris.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_TEST_RECIPIENT }}
     - name: Rename
       run: mv rss.xml rss-chris.xml
+    - name: Run
+      run: python -m workday_scraper -f umair.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_TEST_RECIPIENT }}
+    - name: Rename
+      run: mv rss.xml rss-umair.xml
+    - name: RSS folder
+      run: |
+        mkdir rss
+        mv rss-* rss
     - uses: actions/upload-artifact@v4
       with:
-        path: rss-chris.xml
+        path: rss
     - name: RSS branch
       run: |
         git checkout --orphan rss
