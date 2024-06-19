@@ -28,7 +28,7 @@ jobs:
     - name: Rename
       run: mv rss.xml rss-chris.xml
     - name: Run
-      run: python -m workday_scraper -f umair.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_TEST_RECIPIENT }}
+      run: python -m workday_scraper -f umair.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_UMAIR }}
     - name: Rename
       run: mv rss.xml rss-umair.xml
     - name: RSS folder
