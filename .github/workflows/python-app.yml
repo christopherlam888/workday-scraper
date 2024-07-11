@@ -3,13 +3,15 @@ name: Run Workday Scraper
 on:
   schedule:
     - cron: "0 0 * * *"
+    - cron: "0 0 * * 5,6,0"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  run:
+  run-for-daily-email:
+    if: "!contains(github.event.schedule, '5,6,0')"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -23,14 +25,55 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+      #chris
     - name: Run
       run: python -m workday_scraper -f chris.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_TEST_RECIPIENT }}
     - name: Rename
       run: mv rss.xml rss-chris.xml
+      #umair
     - name: Run
       run: python -m workday_scraper -f umair.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_UMAIR }}
     - name: Rename
       run: mv rss.xml rss-umair.xml
+    - name: RSS folder
+      run: |
+        mkdir rss
+        mv rss-* rss
+    - uses: actions/upload-artifact@v4
+      with:
+        path: rss
+    - name: RSS branch
+      run: |
+        git checkout --orphan rss
+        git rm -rf .
+    - uses: actions/download-artifact@v4
+    - name: Push to rss
+      run: |
+        git config --global user.name "${GITHUB_ACTOR}"
+        git config --global user.email ${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com
+        git add rss/*
+        git commit -m "Run Workday Scraper"
+        git push --set-upstream origin rss --force
+  run-for-weekend-email:
+    if: "contains(github.event.schedule, '5,6,0')"
+    runs-on: ubuntu-latest
+        steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: main
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      #seamus
+    - name: Run
+      run: python -m workday_scraper -f seamus.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_SEAMUS }}
+    - name: Rename
+      run: mv rss.xml rss-seamus.xml
     - name: RSS folder
       run: |
         mkdir rss
