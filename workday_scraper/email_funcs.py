@@ -21,7 +21,7 @@ def compose_email(jobs):
         <table>
           <tr>
             <th>Company</th>
-            <th>Job Title</th>git stat
+            <th>Job Title</th>
             <th>Link</th>
           </tr>
     """

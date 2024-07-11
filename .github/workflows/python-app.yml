@@ -25,15 +25,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-      #chris
-    - name: Run
+      # chris
+    - name: Run Chris
       run: python -m workday_scraper -f chris.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_TEST_RECIPIENT }}
-    - name: Rename
+    - name: Rename Chris
       run: mv rss.xml rss-chris.xml
-      #umair
-    - name: Run
+      # umair
+    - name: Run Umair
       run: python -m workday_scraper -f umair.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_UMAIR }}
-    - name: Rename
+    - name: Rename Umair
       run: mv rss.xml rss-umair.xml
     - name: RSS folder
       run: |
@@ -54,10 +54,11 @@ jobs:
         git add rss/*
         git commit -m "Run Workday Scraper"
         git push --set-upstream origin rss --force
+
   run-for-weekend-email:
     if: "contains(github.event.schedule, '5,6,0')"
     runs-on: ubuntu-latest
-        steps:
+    steps:
     - uses: actions/checkout@v4
       with:
         ref: main
@@ -69,10 +70,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-      #seamus
-    - name: Run
+      # seamus
+    - name: Run Seamus
       run: python -m workday_scraper -f seamus.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_SEAMUS }}
-    - name: Rename
+    - name: Rename Seamus
       run: mv rss.xml rss-seamus.xml
     - name: RSS folder
       run: |
