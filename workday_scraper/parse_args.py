@@ -35,20 +35,7 @@ def parse_args():
         or "-pw" in sys.argv
         or "--password" in sys.argv,
     )
-    parser.add_argument(
-        "-p",
-        "--perpetual",
-        dest="perpetual",
-        action="store_true",
-        required="-t" in sys.argv or "--time-period" in sys.argv,
-    )
-    parser.add_argument(
-        "-t",
-        "--time-period",
-        dest="time-period",
-        type=int,
-        default=1,
-    )
     parser.add_argument("-i", "--initial", dest="initial", action="store_true")
+    parser.add_argument("-nr", "--no-rss", dest="no_rss", action="store_true")
     args = vars(parser.parse_args())
     return args

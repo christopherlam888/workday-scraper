@@ -31,7 +31,7 @@ def get_driver():
     return driver
 
 
-def scrape_job_posting(jobtosend, company, seturl):
+def scrape_job_posting(jobtosend, company, seturl, max_retries=5):
     try:
         driver = get_driver()
         wait = WebDriverWait(driver, 10)
@@ -55,15 +55,17 @@ def scrape_job_posting(jobtosend, company, seturl):
         }
         return job_info
     except:
+        if max_retries <= 0:
+            return
         print("Failed! Retrying...")
-        return scrape_job_posting(jobtosend, company, seturl)
+        return scrape_job_posting(
+            jobtosend, company, seturl, max_retries=max_retries - 1
+        )
 
 
 def main():
     args = parse_args()
     file = args["file"]
-    perpetual = args["perpetual"]
-    period = args["time-period"]
     initial = args["initial"]
 
     # Load or initialize job_ids_dict from file
@@ -152,7 +154,8 @@ def main():
             ) as pbar:
                 params = [(jobtosend, company, seturl) for jobtosend in jobstosend]
                 for job_info in pool.starmap(scrape_job_posting, params):
-                    jobs.append(job_info)
+                    if job_info is not None:
+                        jobs.append(job_info)
                     pbar.update()
 
         print("Done scraping.")
@@ -162,13 +165,10 @@ def main():
         with open("job_postings.json", "w") as jsonfile:
             jsonfile.write(jsondata)
 
-        # Write job postings to an RSS file
-        with open("rss.xml", "w") as rssfile:
-            rssfile.write(generate_rss(jobs))
-
-        # Save job_ids_dict to file
-        with open("job_ids_dict.pkl", "wb") as f:
-            pickle.dump(job_ids_dict, f)
+        # Write job postings to an RSS files
+        if not args["no_rss"]:
+            with open("rss.xml", "w") as rssfile:
+                rssfile.write(generate_rss(jobs))
 
         print("Files written.")
 
@@ -181,12 +181,6 @@ def main():
             password = args["password"]
             send_email(subject, body, sender, recipients, password)
             print("Email sent.")
-
-        if not perpetual:
-            break
-        else:
-            print(f"Waiting for {period} hours before running again...")
-            time.sleep(600 * period)
 
 
 if __name__ == "__main__":
