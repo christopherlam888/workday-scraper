@@ -32,31 +32,34 @@ def get_driver():
 
 
 def scrape_job_posting(jobtosend, company, seturl):
-    try:
-        driver = get_driver()
-        wait = WebDriverWait(driver, 10)
-        job_title = jobtosend[0]
-        job_href = jobtosend[1]
-        driver.get(job_href)
-        time.sleep(1)
-        job_posting_element = wait.until(
-            EC.presence_of_element_located(
-                (By.XPATH, '//div[@data-automation-id="job-posting-details"]')
+    max_retries = 3
+    while max_retries > 0:
+        try:
+            driver = get_driver()
+            wait = WebDriverWait(driver, 10)
+            job_title = jobtosend[0]
+            job_href = jobtosend[1]
+            driver.get(job_href)
+            time.sleep(1)
+            job_posting_element = wait.until(
+                EC.presence_of_element_located(
+                    (By.XPATH, '//div[@data-automation-id="job-posting-details"]')
+                )
             )
-        )
-        job_posting_text = job_posting_element.text
-        driver.close()
-        job_info = {
-            "company": company,
-            "company_url": seturl,
-            "job_title": job_title,
-            "job_href": job_href,
-            "job_posting_text": job_posting_text,
-        }
-        return job_info
-    except:
-        print("Failed! Retrying...")
-        return scrape_job_posting(jobtosend, company, seturl)
+            job_posting_text = job_posting_element.text
+            driver.close()
+            job_info = {
+                "company": company,
+                "company_url": seturl,
+                "job_title": job_title,
+                "job_href": job_href,
+                "job_posting_text": job_posting_text,
+            }
+            return job_info
+        except:
+            print("Failed! Retrying...")
+            max_retries -= 1
+            return None
 
 
 def main():
@@ -65,6 +68,8 @@ def main():
     perpetual = args["perpetual"]
     period = args["time-period"]
     initial = args["initial"]
+    no_json = args["no-json"]
+    no_rss = args["no-rss"]
 
     # Load or initialize job_ids_dict from file
     try:
@@ -152,19 +157,22 @@ def main():
             ) as pbar:
                 params = [(jobtosend, company, seturl) for jobtosend in jobstosend]
                 for job_info in pool.starmap(scrape_job_posting, params):
-                    jobs.append(job_info)
+                    if job_info is not None:
+                        jobs.append(job_info)
                     pbar.update()
 
         print("Done scraping.")
 
         # Write job postings to a JSON file
-        jsondata = json.dumps(jobs, indent=4)
-        with open("job_postings.json", "w") as jsonfile:
-            jsonfile.write(jsondata)
+        if not no_json:
+            jsondata = json.dumps(jobs, indent=4)
+            with open("job_postings.json", "w") as jsonfile:
+                jsonfile.write(jsondata)
 
         # Write job postings to an RSS file
-        with open("rss.xml", "w") as rssfile:
-            rssfile.write(generate_rss(jobs))
+        if not no_rss:
+            with open("rss.xml", "w") as rssfile:
+                rssfile.write(generate_rss(jobs))
 
         # Save job_ids_dict to file
         with open("job_ids_dict.pkl", "wb") as f:
