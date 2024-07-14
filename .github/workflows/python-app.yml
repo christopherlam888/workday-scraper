@@ -35,6 +35,11 @@ jobs:
       run: python -m workday_scraper -f umair.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_UMAIR }} -nj
     - name: Rename Umair
       run: mv rss.xml rss-umair.xml
+      # alex
+    - name: Run Alex
+      run: python -m workday_scraper -f alex.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_ALEX }} -nj
+    - name: Rename Alex
+      run: mv rss.xml rss-alex.xml
     - name: RSS folder
       run: |
         mkdir rss
