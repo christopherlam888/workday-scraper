@@ -42,7 +42,7 @@ jobs:
       run: mv rss.xml rss-alex.xml
       # jeff
     - name: Run Jeff
-      run: python -m workday_scraper -f jeff.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_JEFF }} -nj
+      run: python -m workday_scraper -f jeff.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_JEFFREY }} -nj
     - name: Rename Jeff
       run: mv rss.xml rss-jeff.xml
     - name: RSS folder
