@@ -5,4 +5,3 @@ Microchip,https://wd5.myworkdaysite.com/recruiting/microchiphr/External?zz_LRV_J
 NXP,https://nxp.wd3.myworkdayjobs.com/en-US/careers/jobs?Location_Country=bc33aa3152ec42d4995f4791a106ed09&Location_Country=a30a87ed25634629aa6c3958aa2b91ea&workerSubType=98d67abaaa8a100fa367c93a27fc8ec5
 Analog,https://analogdevices.wd1.myworkdayjobs.com/External?locationCountry=a30a87ed25634629aa6c3958aa2b91ea&locationCountry=bc33aa3152ec42d4995f4791a106ed09&workerSubType=633b03df4f5d1000ec10ab4627a80000
 Cadence,https://cadence.wd1.myworkdayjobs.com/en-US/University_WFO/jobs?workerSubType=631f97c41c2749729ac5abe683f281d0
-
