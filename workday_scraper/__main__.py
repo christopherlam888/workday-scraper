@@ -167,9 +167,9 @@ def main():
         with open("rss.xml", "w") as rssfile:
             rssfile.write(generate_rss(jobs))
 
-    # Save job_ids_dict to file
-    with open("job_ids_dict.pkl", "wb") as f:
-        pickle.dump(job_ids_dict, f)
+    # # Save job_ids_dict to file
+    # with open("job_ids_dict.pkl", "wb") as f:
+    #     pickle.dump(job_ids_dict, f)
 
     print("Files written.")
 
