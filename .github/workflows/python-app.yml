@@ -26,10 +26,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
       # chris
-    - name: Run Chris
-      run: python -m workday_scraper -f chris.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_TEST_RECIPIENT }} -nj
-    - name: Rename Chris
-      run: mv rss.xml rss-chris.xml
+    # - name: Run Chris
+    #   run: python -m workday_scraper -f chris.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_TEST_RECIPIENT }} -nj
+    # - name: Rename Chris
+    #   run: mv rss.xml rss-chris.xml
       # umair
     - name: Run Umair
       run: python -m workday_scraper -f umair.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_UMAIR }} -nj
