@@ -41,10 +41,10 @@ jobs:
     # - name: Rename Ahmed
     #   run: mv rss.xml rss-ahmed.xml
       # alex
-    - name: Run Alex
-      run: python -m workday_scraper -f alex.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_ALEX }} -nj
-    - name: Rename Alex
-      run: mv rss.xml rss-alex.xml
+      # - name: Run Alex
+      # run: python -m workday_scraper -f alex.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_ALEX }} -nj
+      # - name: Rename Alex
+      # run: mv rss.xml rss-alex.xml
       # brennan
     - name: Run Brennan
       run: python -m workday_scraper -f brennan.txt -e ${{ secrets.EMAIL_SENDER }} -pw '${{ secrets.EMAIL_PASSWORD }}' -r ${{ secrets.EMAIL_BRENNAN }} -nj
