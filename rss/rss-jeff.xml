@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+<title>Workday Scraper - RSS Feed</title>
+<link>https://github.com/christopherlam888/workday-scraper</link>
+<description>An RSS feed for new Workday postings.</description>
+
+</channel>
+</rss>
